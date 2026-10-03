@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friend Radio</title>
+<style>
+:root{--blue1:#0a5fe8;--blue2:#0842b8;--navy:#0d1b3a;--navy2:#1b3566;--glow:#6fd0ff;--text:#e6f0ff;--dim:#8fa8d4}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#3a6ea5 radial-gradient(ellipse at 30% 20%,#5a9be0,#2c5a96 70%);font:12px Tahoma,"Trebuchet MS",sans-serif;color:var(--text);display:flex;align-items:center;justify-content:center;padding:12px}
+.win{width:100%;max-width:980px;height:min(640px,calc(100vh - 24px));display:flex;flex-direction:column;border:3px solid var(--blue2);border-top:0;border-radius:9px 9px 4px 4px;background:var(--navy);box-shadow:0 8px 30px #0008;overflow:hidden}
+.title{height:30px;flex:none;display:flex;align-items:center;gap:8px;padding:0 5px 0 8px;font-weight:bold;font-size:13px;color:#fff;text-shadow:1px 1px #0a246a;background:linear-gradient(#3c8cf5 0,#0a5fe8 15%,#0a5fe8 70%,#0842b8 100%)}
+.title .ico{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#6fd0ff 40%,#1b6bd6)}
+.title span.t{flex:1}
+.wb{width:22px;height:22px;border:1px solid #fff;border-radius:3px;background:linear-gradient(#5b9bff,#1c5fd6);color:#fff;font:bold 11px Tahoma;line-height:18px;text-align:center}
+.wb.x{background:linear-gradient(#e8957a,#c8401c)}
+.menu{flex:none;background:#ece9d8;color:#000;padding:2px 6px;display:flex;gap:14px;border-bottom:1px solid #aca899}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:190px 1fr 250px;background:linear-gradient(#10244d,#0a1530)}
+.pane{min-height:0;overflow:auto;padding:8px}
+.left{border-right:1px solid #2a4a8a;background:linear-gradient(#143063,#0b1a3a)}
+.right{border-left:1px solid #2a4a8a;background:linear-gradient(#0f2250,#091330)}
+h3{margin:0 0 6px;font-size:12px;color:var(--glow);font-weight:bold;border-bottom:1px solid #2a4a8a;padding-bottom:4px}
+.genre{display:block;width:100%;text-align:left;margin:2px 0;padding:5px 8px;border:1px solid transparent;border-radius:3px;background:none;color:var(--text);font:inherit;cursor:pointer}
+.genre:hover{background:#ffffff14;border-color:#3d66b8}
+.genre.on{background:linear-gradient(#3d86f0,#1650b8);border-color:#8fc4ff;font-weight:bold}
+.genre small{display:block;color:var(--dim);font-weight:normal}
+.genre.on small{color:#cfe4ff}
+.center{display:flex;flex-direction:column;padding:8px;min-width:0}
+.viz{flex:1;min-height:120px;border:2px inset #20407f;border-radius:3px;background:#000;position:relative}
+canvas{width:100%;height:100%;display:block}
+.np{padding:8px 4px 2px}
+.np b{display:block;font-size:16px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np span{color:var(--dim)}
+.tr{display:grid;grid-template-columns:20px 1fr 40px;gap:4px;padding:3px 4px;border-radius:2px;color:var(--dim)}
+.tr.cur{background:linear-gradient(#3d86f0,#1650b8);color:#fff}
+.tr i{font-style:normal;text-align:center}
+.tr em{font-style:normal;text-align:right}
+.tr div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar{flex:none;height:78px;padding:8px 14px;display:flex;align-items:center;gap:14px;background:linear-gradient(#2a4f9c 0,#17306a 45%,#0c1d45 50%,#0a1738 100%);border-top:1px solid #6fa3ff}
+.seek{flex:1;display:flex;flex-direction:column;gap:6px}
+.track{height:8px;border:1px solid #05102a;border-radius:4px;background:#050d22;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(#a8e6ff,#2e9bef)}
+.time{display:flex;justify-content:space-between;color:var(--dim)}
+.btn{width:34px;height:34px;border-radius:50%;border:1px solid #9fcfff;background:radial-gradient(circle at 50% 20%,#9fd8ff,#2a77de 55%,#123f8f);color:#fff;font-size:13px;cursor:pointer;box-shadow:0 0 6px #0006}
+.btn.play{width:50px;height:50px;font-size:18px;border-color:#c8f5c0;background:radial-gradient(circle at 50% 20%,#d6ffcf,#3cc03a 55%,#177a15);box-shadow:0 0 12px #5dff5a66}
+.btn:active{filter:brightness(.85)}
+.btn:focus-visible,.genre:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.vol{display:flex;align-items:center;gap:6px;color:var(--dim)}
+input[type=range]{width:90px;accent-color:#3cc03a}
+.status{flex:none;background:#ece9d8;color:#000;padding:3px 8px;display:flex;justify-content:space-between;border-top:1px solid #aca899}
+.lock{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;z-index:9;padding:12px}
+.lock.hide{display:none}
+.dlg{width:340px;background:#ece9d8;color:#000;border:3px solid var(--blue2);border-top:0;border-radius:8px 8px 3px 3px;overflow:hidden;box-shadow:0 8px 30px #000a}
+.dlg .title{font-size:12px}
+.dlg form{padding:16px;display:grid;gap:10px}
+.dlg input{padding:5px;border:1px solid #7f9db9;font:inherit}
+.dlg button{justify-self:end;padding:4px 18px;border:1px solid #003c74;border-radius:3px;background:linear-gradient(#fff,#ece9d8 85%,#d6d0c0);font:inherit;cursor:pointer}
+.err{color:#b00;min-height:14px}
+.xp{padding:4px 12px;border:1px solid #003c74;border-radius:3px;background:linear-gradient(#fff,#ece9d8 85%,#d6d0c0);font:12px Tahoma,sans-serif;color:#000;cursor:pointer}
+.xp:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:760px){.main{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;overflow:auto}.left,.right{border:0;max-height:170px}.win{height:calc(100vh - 24px)}.bar{flex-wrap:wrap;height:auto}.vol{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="lock" id="lock">
+ <div class="dlg">
+  <div class="title"><div class="ico"></div><span class="t">The Doors of Durin</span></div>
+  <form id="pw">
+   <label for="p">Speak, friend, and enter.</label>
+   <input id="p" type="password" autocomplete="off" autofocus>
+   <div class="err" id="err"></div>
+   <button>OK</button>
+  </form>
+ </div>
+</div>
+
+<div class="win">
+ <div class="title"><div class="ico"></div><span class="t">Friend Radio - Windows Media Player</span><div class="wb">_</div><div class="wb">&#9633;</div><div class="wb x">x</div></div>
+ <div class="menu"><span>File</span><span>View</span><span>Play</span><span>Tools</span><span>Help</span></div>
+ <div class="main">
+  <div class="pane left"><h3>Radio Tuner</h3><div id="genres"></div></div>
+  <div class="center">
+   <div class="viz"><canvas id="cv"></canvas></div>
+   <div class="np"><b id="ttl">Pick a station</b><span id="sub">Choose a genre on the left to start listening.</span></div>
+  </div>
+  <div class="pane right"><h3 id="plh">Now Playing List</h3><div id="list"></div></div>
+ </div>
+ <div class="bar">
+  <button class="btn" id="stop" title="Stop" aria-label="Stop">&#9632;</button>
+  <button class="btn play" id="play" title="Tune in" aria-label="Play">&#9654;</button>
+  <div class="seek"><div class="track"><div class="fill" id="fill"></div></div><div class="time"><span id="cur">0:00</span><span id="dur">0:00</span></div></div>
+  <button class="xp" id="inv">Copy invite link</button>
+  <div class="vol">Vol <input type="range" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></div>
+ </div>
+ <div class="status"><span id="st">Ready</span><span id="clock"></span></div>
+</div>
+
+<script>
+// ---- Settings ----
+// Password hash (SHA-256). Replace with your own, see README.
+const PASS_HASH="83006a438f94daf3a7dd9c7b27f70c15e443c0ca55d58fcdfa76899ae466b455";
+// Everyone's "radio clock" starts at this moment. Don't change it, or stations shift for everybody.
+const EPOCH=Date.UTC(2024,0,1);
+
+const $=id=>document.getElementById(id);
+const audio=new Audio(); audio.crossOrigin="anonymous"; audio.preload="auto";
+let data={},genre=null,list=[],idx=-1,playing=false,noSeek=false,actx,analyser,bins;
+
+const fmt=s=>{s=Math.max(0,Math.floor(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const sha=async t=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,"0")).join("");
+
+// ---- Password gate (convenience only, not real security) ----
+async function open(){
+  $("lock").classList.add("hide");
+  try{
+    const r=await fetch("tracks.json",{cache:"no-cache"});
+    data=await r.json();
+    buildGenres();
+    const want=decodeURIComponent((location.hash.match(/genre=([^&]+)/)||[])[1]||"");
+    if(data[want]){await pick(want);if(!playing)$("st").textContent="Invite link ready: press Play to join "+want}
+  }catch(e){$("sub").textContent="Could not load tracks.json. Check the file for typos."}
+}
+$("pw").onsubmit=async e=>{
+  e.preventDefault();
+  if(await sha($("p").value)===PASS_HASH){try{sessionStorage.setItem("ok",PASS_HASH)}catch(_){}open()}
+  else{$("err").textContent="The doors do not open. Try again.";$("p").select()}
+};
+try{if(sessionStorage.getItem("ok")===PASS_HASH)open()}catch(_){}
+
+// ---- Genres ----
+function buildGenres(){
+  const g=$("genres");g.innerHTML="";
+  Object.entries(data).forEach(([name,info])=>{
+    const b=document.createElement("button");b.className="genre";
+    b.innerHTML=`${name}<small>${(info.tracks||[]).length} tracks</small>`;
+    b.onclick=()=>pick(name);g.appendChild(b);
+  });
+}
+async function pick(name){
+  genre=name;noSeek=false;
+  document.querySelectorAll(".genre").forEach(b=>b.classList.toggle("on",b.firstChild.textContent===name));
+  list=data[name].tracks||[];
+  history.replaceState(null,"","#genre="+encodeURIComponent(name));
+  $("plh").textContent=name+" Playlist";
+  $("st").textContent="Reading track lengths...";
+  await fillDurations(list);
+  drawList();
+  tune();
+}
+// Tracks without a "duration" in tracks.json get measured from the audio file.
+function fillDurations(l){
+  return Promise.all(l.filter(t=>!t.duration).map(t=>new Promise(res=>{
+    const a=new Audio();a.preload="metadata";a.src=t.file;
+    a.onloadedmetadata=()=>{t.duration=a.duration;res()};a.onerror=()=>{t.duration=0;res()};
+  })));
+}
+
+// ---- Clock sync: same genre + same clock = same song, same second ----
+function where(){
+  const ok=list.filter(t=>t.duration>0);
+  const total=ok.reduce((a,t)=>a+t.duration,0);
+  if(!total)return null;
+  let p=((Date.now()-EPOCH)/1000)%total;
+  for(const t of ok){if(p<t.duration)return{t,offset:p};p-=t.duration}
+}
+function tune(){
+  const w=where();
+  if(!w){$("st").textContent="No playable tracks in this genre.";return}
+  idx=list.indexOf(w.t);
+  audio.src=w.t.file;
+  audio.onloadedmetadata=()=>{audio.currentTime=Math.min(w.offset,audio.duration-0.1||0)};
+  audio.volume=+$("vol").value;
+  audio.play().then(()=>{playing=true;startViz();$("st").textContent="Playing live: "+genre}).catch(()=>{$("st").textContent="Press Play to start (browser blocked autoplay)"});
+  $("ttl").textContent=w.t.title;
+  $("sub").textContent=(w.t.artist?"by "+w.t.artist:"")+" - "+genre;
+  $("dur").textContent=fmt(w.t.duration);
+  drawList();
+}
+function drawList(){
+  $("list").innerHTML=list.map((t,i)=>`<div class="tr ${i===idx?"cur":""}"><i>${i===idx?"&#9654;":i+1}</i><div title="${t.title}">${t.title}${t.artist?" - "+t.artist:""}</div><em>${fmt(t.duration||0)}</em></div>`).join("");
+}
+$("play").onclick=()=>{if(genre)tune();else $("st").textContent="Pick a genre first"};
+$("stop").onclick=()=>{audio.pause();playing=false;$("st").textContent="Stopped"};
+$("inv").onclick=async()=>{
+  if(!genre){$("st").textContent="Pick a genre first";return}
+  const url=location.origin+location.pathname+"#genre="+encodeURIComponent(genre);
+  try{await navigator.clipboard.writeText(url);$("st").textContent="Invite link copied for "+genre}
+  catch(_){prompt("Copy this invite link:",url)}
+};
+$("vol").oninput=e=>audio.volume=+e.target.value;
+audio.onended=()=>{if(playing)tune()};
+
+// Every second: update the clock and fix drift, so late joiners and laggy tabs stay in sync.
+setInterval(()=>{
+  $("clock").textContent=new Date().toLocaleTimeString();
+  if(!playing||!genre)return;
+  const w=where();if(!w)return;
+  if(!noSeek&&list.indexOf(w.t)!==idx){tune();return}
+  if(!noSeek&&!audio.paused&&Math.abs(audio.currentTime-w.offset)>2.5){
+    const target=w.offset;audio.currentTime=target;
+    // If the server can't seek, the song snaps back to the start. Detect that and stop fighting it.
+    setTimeout(()=>{if(target>5&&audio.currentTime<3){noSeek=true;$("st").textContent="This server can't seek audio, so sync is off. Use serve.py locally."}},800);
+  }
+  $("cur").textContent=fmt(audio.currentTime);
+  $("fill").style.width=(audio.currentTime/(w.t.duration||1)*100)+"%";
+},1000);
+audio.ontimeupdate=()=>{if(list[idx])$("fill").style.width=(audio.currentTime/(list[idx].duration||audio.duration||1)*100)+"%"};
+
+// ---- Visualizer (bars) ----
+const cv=$("cv"),cx=cv.getContext("2d");
+function startViz(){
+  if(analyser)return;
+  try{
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    const src=actx.createMediaElementSource(audio);
+    analyser=actx.createAnalyser();analyser.fftSize=128;
+    src.connect(analyser);analyser.connect(actx.destination);
+    bins=new Uint8Array(analyser.frequencyBinCount);
+  }catch(e){analyser=null}
+}
+function frame(t){
+  const w=cv.width=cv.clientWidth,h=cv.height=cv.clientHeight,n=40,bw=w/n;
+  cx.fillStyle="#000";cx.fillRect(0,0,w,h);
+  if(analyser)analyser.getByteFrequencyData(bins);
+  for(let i=0;i<n;i++){
+    const v=analyser&&playing?bins[Math.floor(i*bins.length/n)]/255:0.05+0.03*Math.sin(t/600+i/3);
+    const bh=v*h*0.9;
+    const g=cx.createLinearGradient(0,h,0,h-bh);
+    g.addColorStop(0,"#1b6bd6");g.addColorStop(1,"#6fffb0");
+    cx.fillStyle=g;cx.fillRect(i*bw+1,h-bh,bw-2,bh);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
