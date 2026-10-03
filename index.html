@@ -8,7 +8,7 @@
 :root{--blue1:#0a5fe8;--blue2:#0842b8;--navy:#0d1b3a;--navy2:#1b3566;--glow:#6fd0ff;--text:#e6f0ff;--dim:#8fa8d4}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{background:#3a6ea5 radial-gradient(ellipse at 30% 20%,#5a9be0,#2c5a96 70%);font:12px Tahoma,"Trebuchet MS",sans-serif;color:var(--text);display:flex;align-items:center;justify-content:center;padding:12px}
+body{background:url("xpbg.jpg") center/cover no-repeat fixed,radial-gradient(ellipse at 30% 20%,#5a9be0,#2c5a96 70%) #3a6ea5;font:12px Tahoma,"Trebuchet MS",sans-serif;color:var(--text);display:flex;align-items:center;justify-content:center;padding:12px}
 .win{width:100%;max-width:980px;height:min(640px,calc(100vh - 24px));display:flex;flex-direction:column;border:3px solid var(--blue2);border-top:0;border-radius:9px 9px 4px 4px;background:var(--navy);box-shadow:0 8px 30px #0008;overflow:hidden}
 .title{height:30px;flex:none;display:flex;align-items:center;gap:8px;padding:0 5px 0 8px;font-weight:bold;font-size:13px;color:#fff;text-shadow:1px 1px #0a246a;background:linear-gradient(#3c8cf5 0,#0a5fe8 15%,#0a5fe8 70%,#0842b8 100%)}
 .title .ico{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#6fd0ff 40%,#1b6bd6)}
@@ -32,7 +32,9 @@ canvas{width:100%;height:100%;display:block}
 .np{padding:8px 4px 2px}
 .np b{display:block;font-size:16px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np span{color:var(--dim)}
-.tr{display:grid;grid-template-columns:20px 1fr 40px;gap:4px;padding:3px 4px;border-radius:2px;color:var(--dim)}
+.tr{cursor:pointer;display:grid;grid-template-columns:20px 1fr 40px;gap:4px;padding:3px 4px;border-radius:2px;color:var(--dim)}
+.tr:hover{background:#ffffff1a;color:#fff}
+.tr:focus-visible{outline:2px solid #fff;outline-offset:-2px}
 .tr.cur{background:linear-gradient(#3d86f0,#1650b8);color:#fff}
 .tr i{font-style:normal;text-align:center}
 .tr em{font-style:normal;text-align:right}
@@ -92,6 +94,7 @@ input[type=range]{width:90px;accent-color:#3cc03a}
   <button class="btn" id="stop" title="Stop" aria-label="Stop">&#9632;</button>
   <button class="btn play" id="play" title="Tune in" aria-label="Play">&#9654;</button>
   <div class="seek"><div class="track"><div class="fill" id="fill"></div></div><div class="time"><span id="cur">0:00</span><span id="dur">0:00</span></div></div>
+  <button class="xp" id="live" hidden>Back to live</button>
   <button class="xp" id="inv">Copy invite link</button>
   <div class="vol">Vol <input type="range" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></div>
  </div>
@@ -107,7 +110,7 @@ const EPOCH=Date.UTC(2024,0,1);
 
 const $=id=>document.getElementById(id);
 const audio=new Audio(); audio.crossOrigin="anonymous"; audio.preload="auto";
-let data={},genre=null,list=[],idx=-1,playing=false,noSeek=false,actx,analyser,bins;
+let data={},genre=null,list=[],idx=-1,playing=false,noSeek=false,manual=false,actx,analyser,bins;
 
 const fmt=s=>{s=Math.max(0,Math.floor(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
 const sha=async t=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,"0")).join("");
@@ -167,6 +170,7 @@ function where(){
   for(const t of ok){if(p<t.duration)return{t,offset:p};p-=t.duration}
 }
 function tune(){
+  manual=false;$("live").hidden=true;
   const w=where();
   if(!w){$("st").textContent="No playable tracks in this genre.";return}
   idx=list.indexOf(w.t);
@@ -179,9 +183,27 @@ function tune(){
   $("dur").textContent=fmt(w.t.duration);
   drawList();
 }
+const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function drawList(){
-  $("list").innerHTML=list.map((t,i)=>`<div class="tr ${i===idx?"cur":""}"><i>${i===idx?"&#9654;":i+1}</i><div title="${t.title}">${t.title}${t.artist?" - "+t.artist:""}</div><em>${fmt(t.duration||0)}</em></div>`).join("");
+  $("list").innerHTML=list.map((t,i)=>`<div class="tr ${i===idx?"cur":""}" data-i="${i}" role="button" tabindex="0" title="Play this track"><i>${i===idx?"&#9654;":i+1}</i><div>${esc(t.title)}${t.artist?" - "+esc(t.artist):""}</div><em>${fmt(t.duration||0)}</em></div>`).join("");
 }
+// Click a track to play it from the start, off the radio clock. "Back to live" (or Play) rejoins the shared stream.
+function playTrack(i){
+  const t=list[i];if(!t)return;
+  manual=true;idx=i;
+  audio.onloadedmetadata=null;
+  audio.src=t.file;audio.currentTime=0;audio.volume=+$("vol").value;
+  audio.play().then(()=>{playing=true;startViz()}).catch(()=>{$("st").textContent="Press Play to start (browser blocked autoplay)"});
+  $("ttl").textContent=t.title;
+  $("sub").textContent=(t.artist?"by "+t.artist:"")+" - "+genre;
+  $("dur").textContent=fmt(t.duration||0);
+  $("live").hidden=false;
+  $("st").textContent="On demand (not synced). Press Back to live to rejoin the radio.";
+  drawList();
+}
+$("list").onclick=e=>{const r=e.target.closest(".tr");if(r)playTrack(+r.dataset.i)};
+$("list").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){const r=e.target.closest(".tr");if(r){e.preventDefault();playTrack(+r.dataset.i)}}};
+$("live").onclick=()=>tune();
 $("play").onclick=()=>{if(genre)tune();else $("st").textContent="Pick a genre first"};
 $("stop").onclick=()=>{audio.pause();playing=false;$("st").textContent="Stopped"};
 $("inv").onclick=async()=>{
@@ -191,12 +213,13 @@ $("inv").onclick=async()=>{
   catch(_){prompt("Copy this invite link:",url)}
 };
 $("vol").oninput=e=>audio.volume=+e.target.value;
-audio.onended=()=>{if(playing)tune()};
+audio.onended=()=>{if(!playing)return;manual?playTrack((idx+1)%list.length):tune()};
 
 // Every second: update the clock and fix drift, so late joiners and laggy tabs stay in sync.
 setInterval(()=>{
   $("clock").textContent=new Date().toLocaleTimeString();
   if(!playing||!genre)return;
+  if(manual){$("cur").textContent=fmt(audio.currentTime);return}
   const w=where();if(!w)return;
   if(!noSeek&&list.indexOf(w.t)!==idx){tune();return}
   if(!noSeek&&!audio.paused&&Math.abs(audio.currentTime-w.offset)>2.5){
