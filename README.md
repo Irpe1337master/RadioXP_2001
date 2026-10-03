@@ -23,3 +23,9 @@ All stations loop forever from a fixed start date (`EPOCH`). The page uses the c
 - Adding, removing or renaming tracks changes the schedule, so stations jump for everyone. Prefix filenames with numbers (`01 - ...`) to control order.
 - Friends' device clocks must be roughly correct (automatic time on).
 - Audio on another domain needs CORS enabled for the visualizer.
+
+## Automatic tracks.json (GitHub Actions)
+`.github/workflows/update-tracks.yml` runs `scan_music.py` when files in `music/` change and commits the updated `tracks.json`.
+- Pull request from a branch in this repo: the bot commits `tracks.json` onto the PR.
+- Pull request from a fork: the scan runs, but nothing is pushed. `tracks.json` updates after the PR is merged into `main`.
+- Needs Settings > Actions > General > Workflow permissions set to "Read and write" if the bot can't push.

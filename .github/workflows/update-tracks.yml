@@ -1,0 +1,49 @@
+name: Update tracks.json
+
+# Runs scan_music.py whenever music files change and commits the new tracks.json.
+on:
+  pull_request:
+    paths: ["music/**"]
+  push:
+    branches: [main]
+    paths: ["music/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-tracks-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Same-repo PRs: check out the PR branch so we can push to it.
+          # Fork PRs and pushes: use the default checkout.
+          ref: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.head_ref || '' }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install mutagen
+
+      - run: python scan_music.py
+
+      - name: Commit tracks.json
+        # Fork PRs can't be pushed to; tracks.json updates after they are merged instead.
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if [ -z "$(git status --porcelain tracks.json)" ]; then
+            echo "tracks.json is already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tracks.json
+          git commit -m "Update tracks.json"
+          git push
