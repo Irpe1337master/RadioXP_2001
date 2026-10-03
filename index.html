@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Friend Radio</title>
 <style>
 :root{--blue1:#0a5fe8;--blue2:#0842b8;--navy:#0d1b3a;--navy2:#1b3566;--glow:#6fd0ff;--text:#e6f0ff;--dim:#8fa8d4}
@@ -61,7 +61,30 @@ input[type=range]{width:90px;accent-color:#3cc03a}
 .err{color:#b00;min-height:14px}
 .xp{padding:4px 12px;border:1px solid #003c74;border-radius:3px;background:linear-gradient(#fff,#ece9d8 85%,#d6d0c0);font:12px Tahoma,sans-serif;color:#000;cursor:pointer}
 .xp:focus-visible{outline:2px solid #fff;outline-offset:2px}
-@media(max-width:760px){.main{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;overflow:auto}.left,.right{border:0;max-height:170px}.win{height:calc(100vh - 24px)}.bar{flex-wrap:wrap;height:auto}.vol{display:none}}
+@media(max-width:760px){
+ body{padding:0;display:block}
+ .win{max-width:none;height:100vh;height:100dvh;border-width:0;border-radius:0}
+ .menu{display:none}
+ .main{display:flex;flex-direction:column;overflow:hidden}
+ .left{flex:none;border:0;border-bottom:1px solid #2a4a8a;padding:6px 8px;overflow-x:auto;overflow-y:hidden}
+ .left h3{display:none}
+ #genres{display:flex;gap:6px;width:max-content}
+ .genre{width:auto;margin:0;padding:8px 14px;border-radius:16px;border-color:#3d66b8;white-space:nowrap}
+ .genre small{display:inline;margin-left:6px;font-size:11px}
+ .center{flex:none;padding:6px 10px 0}
+ .viz{flex:none;height:44px;min-height:0}
+ .np{padding:6px 2px}
+ .np b{font-size:15px}
+ .right{flex:1;min-height:0;border:0;padding:2px 6px}
+ .tr{grid-template-columns:24px 1fr 44px;padding:11px 6px;font-size:14px;border-bottom:1px solid #ffffff10}
+ .bar{height:auto;flex-wrap:wrap;gap:8px 10px;padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
+ .bar .seek{flex:1 1 0;min-width:0}
+ .xp{flex:1 1 40%;padding:9px 8px;font-size:13px}
+ .vol,#clock{display:none}
+ .status{padding:3px 10px}
+ .status span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(max-height:480px){.viz,.menu{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -145,6 +168,7 @@ function buildGenres(){
 async function pick(name){
   genre=name;noSeek=false;
   document.querySelectorAll(".genre").forEach(b=>b.classList.toggle("on",b.firstChild.textContent===name));
+  const on=document.querySelector(".genre.on");if(on)on.scrollIntoView({inline:"nearest",block:"nearest"});
   list=data[name].tracks||[];
   history.replaceState(null,"","#genre="+encodeURIComponent(name));
   $("plh").textContent=name+" Playlist";
@@ -186,6 +210,7 @@ function tune(){
 const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function drawList(){
   $("list").innerHTML=list.map((t,i)=>`<div class="tr ${i===idx?"cur":""}" data-i="${i}" role="button" tabindex="0" title="Play this track"><i>${i===idx?"&#9654;":i+1}</i><div>${esc(t.title)}${t.artist?" - "+esc(t.artist):""}</div><em>${fmt(t.duration||0)}</em></div>`).join("");
+  const c=$("list").querySelector(".cur");if(c)c.scrollIntoView({block:"nearest"});
 }
 // Click a track to play it from the start, off the radio clock. "Back to live" (or Play) rejoins the shared stream.
 function playTrack(i){
@@ -246,6 +271,7 @@ function startViz(){
 }
 function frame(t){
   const w=cv.width=cv.clientWidth,h=cv.height=cv.clientHeight,n=40,bw=w/n;
+  if(!h){requestAnimationFrame(frame);return}
   cx.fillStyle="#000";cx.fillRect(0,0,w,h);
   if(analyser)analyser.getByteFrequencyData(bins);
   for(let i=0;i<n;i++){
