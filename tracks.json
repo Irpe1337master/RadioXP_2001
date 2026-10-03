@@ -1,11 +1,11 @@
 {
-  "Skyrim": {
+  "Tavern": {
     "tracks": [
       {
-        "title": "Mandala",
-        "artist": "Blastoyz",
-        "file": "music/skyrim/Blastoyz%20-%20Mandala.mp3",
-        "duration": 357.528
+        "title": "Firelight And Ale",
+        "artist": "",
+        "file": "music/tavern/Firelight_and_Ale.mp3",
+        "duration": 174.498
       }
     ]
   }
