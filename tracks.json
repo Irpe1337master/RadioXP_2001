@@ -21,6 +21,16 @@
       }
     ]
   },
+  "Mc Iron": {
+    "tracks": [
+      {
+        "title": "Sabo Oikeuden Nyrkki",
+        "artist": "",
+        "file": "music/MC-Iron/Sabo_Oikeuden_nyrkki.mp3",
+        "duration": 160.235
+      }
+    ]
+  },
   "Tavern": {
     "tracks": [
       {
