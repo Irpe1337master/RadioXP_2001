@@ -1,4 +1,14 @@
 {
+  "Lofi": {
+    "tracks": [
+      {
+        "title": "Five O Clock Light",
+        "artist": "",
+        "file": "music/lofi/Five_O_Clock_Light.mp3",
+        "duration": 175.491
+      }
+    ]
+  },
   "Tavern": {
     "tracks": [
       {
