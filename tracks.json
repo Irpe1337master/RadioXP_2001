@@ -21,6 +21,16 @@
       }
     ]
   },
+  "Mciron": {
+    "tracks": [
+      {
+        "title": "Sabo Oikeuden Nyrkki",
+        "artist": "",
+        "file": "music/MCIron/Sabo_Oikeuden_nyrkki.mp3",
+        "duration": 160.235
+      }
+    ]
+  },
   "Tavern": {
     "tracks": [
       {
