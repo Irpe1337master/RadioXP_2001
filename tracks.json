@@ -31,6 +31,40 @@
       }
     ]
   },
+  "Metalcoree": {
+    "tracks": [
+      {
+        "title": "A Beautiful Chain",
+        "artist": "",
+        "file": "music/Metalcoree/A_Beautiful_Chain.mp3",
+        "duration": 179.984
+      },
+      {
+        "title": "Pulling At The Seams",
+        "artist": "",
+        "file": "music/Metalcoree/Pulling_at_the_Seams.mp3",
+        "duration": 180.402
+      },
+      {
+        "title": "Rhythm Of Our Defeat",
+        "artist": "",
+        "file": "music/Metalcoree/Rhythm_of_Our_Defeat.mp3",
+        "duration": 182.152
+      },
+      {
+        "title": "Soften To Gold",
+        "artist": "",
+        "file": "music/Metalcoree/Soften_To_Gold.mp3",
+        "duration": 169.587
+      },
+      {
+        "title": "The Hand The Hammer",
+        "artist": "",
+        "file": "music/Metalcoree/The_Hand_The_Hammer.mp3",
+        "duration": 181.917
+      }
+    ]
+  },
   "Tavern": {
     "tracks": [
       {
