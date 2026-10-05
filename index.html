@@ -128,6 +128,7 @@ input[type=range]{width:90px;accent-color:#3cc03a}
 // ---- Settings ----
 // Password hash (SHA-256). Replace with your own, see README.
 const PASS_HASH="83006a438f94daf3a7dd9c7b27f70c15e443c0ca55d58fcdfa76899ae466b455";
+const PASS_HASH2="c58557fcfe37300200790917ea2cb9b27a015de83d02297f80d84fbe9caa44f9";
 // Everyone's "radio clock" starts at this moment. Don't change it, or stations shift for everybody.
 const EPOCH=Date.UTC(2024,0,1);
 
@@ -151,10 +152,22 @@ async function open(){
 }
 $("pw").onsubmit=async e=>{
   e.preventDefault();
-  if(await sha($("p").value)===PASS_HASH){try{sessionStorage.setItem("ok",PASS_HASH)}catch(_){}open()}
-  else{$("err").textContent="The doors do not open. Try again.";$("p").select()}
+
+  const hash=await sha($("p").value);
+
+  if(hash===PASS_HASH || hash===PASS_HASH2){
+    try{sessionStorage.setItem("ok",hash)}catch(_){}
+    open();
+  }else{
+    $("err").textContent="The doors do not open. Try again.";
+    $("p").select();
+  }
 };
-try{if(sessionStorage.getItem("ok")===PASS_HASH)open()}catch(_){}
+
+try{
+  const saved=sessionStorage.getItem("ok");
+  if(saved===PASS_HASH || saved===PASS_HASH2)open();
+}catch(_){}
 
 // ---- Genres ----
 function buildGenres(){
