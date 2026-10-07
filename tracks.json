@@ -24,6 +24,12 @@
   "Mciron": {
     "tracks": [
       {
+        "title": "Metsä Boi",
+        "artist": "",
+        "file": "music/MCIron/Mets%C3%A4_boi.mp3",
+        "duration": 182.518
+      },
+      {
         "title": "Sabo Oikeuden Nyrkki",
         "artist": "",
         "file": "music/MCIron/Sabo_Oikeuden_nyrkki.mp3",
@@ -62,6 +68,34 @@
         "artist": "",
         "file": "music/Metalcoree/The_Hand_The_Hammer.mp3",
         "duration": 181.917
+      }
+    ]
+  },
+  "Synthwave": {
+    "tracks": [
+      {
+        "title": "Amber Afternoon (1)",
+        "artist": "",
+        "file": "music/Synthwave/Amber_Afternoon%20%281%29.mp3",
+        "duration": 152.268
+      },
+      {
+        "title": "Magenta Haze",
+        "artist": "",
+        "file": "music/Synthwave/Magenta_Haze.mp3",
+        "duration": 169.091
+      },
+      {
+        "title": "Solstice On The Horizon",
+        "artist": "",
+        "file": "music/Synthwave/Solstice_on_the_Horizon.mp3",
+        "duration": 182.047
+      },
+      {
+        "title": "The Last Train Home",
+        "artist": "",
+        "file": "music/Synthwave/The_Last_Train_Home.mp3",
+        "duration": 169.326
       }
     ]
   },
