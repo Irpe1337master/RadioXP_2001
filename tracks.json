@@ -148,22 +148,10 @@
   "Shoegaze": {
     "tracks": [
       {
-        "title": "Asphalt Afternoon (1)",
-        "artist": "",
-        "file": "music/Shoegaze/Asphalt_Afternoon%20%281%29.mp3",
-        "duration": 182.518
-      },
-      {
         "title": "Hours To Lose",
         "artist": "",
         "file": "music/Shoegaze/Hours_to_Lose.mp3",
         "duration": 181.473
-      },
-      {
-        "title": "The Afternoon We Lost",
-        "artist": "",
-        "file": "music/Shoegaze/The_Afternoon_We_Lost.mp3",
-        "duration": 177.241
       },
       {
         "title": "Velvet Stone (1)",
