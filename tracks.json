@@ -1,4 +1,32 @@
 {
+  "8Bit": {
+    "tracks": [
+      {
+        "title": "Beyond The Iron Gate",
+        "artist": "",
+        "file": "music/8bit/Beyond_the_Iron_Gate.mp3",
+        "duration": 174.002
+      },
+      {
+        "title": "One More Continue",
+        "artist": "",
+        "file": "music/8bit/One_More_Continue.mp3",
+        "duration": 156.447
+      },
+      {
+        "title": "Three Lives Left",
+        "artist": "",
+        "file": "music/8bit/Three_Lives_Left.mp3",
+        "duration": 173.558
+      },
+      {
+        "title": "Victory Lap",
+        "artist": "",
+        "file": "music/8bit/Victory_Lap.mp3",
+        "duration": 161.019
+      }
+    ]
+  },
   "Kaikuva": {
     "tracks": [
       {
