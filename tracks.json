@@ -1,4 +1,50 @@
 {
+  "Kaikuva": {
+    "tracks": [
+      {
+        "title": "Ambient Drifts",
+        "artist": "Kaikuva",
+        "file": "music/Kaikuva/Ambient%20Drifts.mp3",
+        "duration": 269.84
+      },
+      {
+        "title": "Ambientscape",
+        "artist": "Kaikuva",
+        "file": "music/Kaikuva/Ambientcsape.mp3",
+        "duration": 269.88
+      },
+      {
+        "title": "Drifting Mycelium",
+        "artist": "Kaikuva",
+        "file": "music/Kaikuva/Drifting%20Mycelium.mp3",
+        "duration": 240.76
+      },
+      {
+        "title": "Echoes in the Canopy",
+        "artist": "Kaikuva/unassumingreverb",
+        "file": "music/Kaikuva/echoes_echoes.mp3",
+        "duration": 240.024
+      },
+      {
+        "title": "Lost in the Beat",
+        "artist": "Kaikuva/unassumingreverb",
+        "file": "music/Kaikuva/Lost%20in%20the%20Beat.mp3",
+        "duration": 239.04
+      },
+      {
+        "title": "Moss Drift",
+        "artist": "Kaikuva",
+        "file": "music/Kaikuva/Moss%20Drift.mp3",
+        "duration": 381.08
+      },
+      {
+        "title": "Neon Shadows",
+        "artist": "Kaikuva/unassumingreverb",
+        "file": "music/Kaikuva/Neon_Shadows.mp3",
+        "duration": 240.024
+      }
+    ]
+  },
   "Lofi": {
     "tracks": [
       {
