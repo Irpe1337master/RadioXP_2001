@@ -76,6 +76,12 @@
   "Lofi": {
     "tracks": [
       {
+        "title": "Cold Glass Warm Room",
+        "artist": "",
+        "file": "music/lofi/Cold_Glass_Warm_Room.mp3",
+        "duration": 147.54
+      },
+      {
         "title": "Five O Clock Light",
         "artist": "",
         "file": "music/lofi/Five_O_Clock_Light.mp3",
@@ -92,6 +98,12 @@
         "artist": "",
         "file": "music/lofi/Rain_on_the_Deck.mp3",
         "duration": 173.296
+      },
+      {
+        "title": "Tea Cooling On The Desk",
+        "artist": "",
+        "file": "music/lofi/Tea_Cooling_On_The_Desk.mp3",
+        "duration": 155.22
       }
     ]
   },
