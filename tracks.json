@@ -27,6 +27,28 @@
       }
     ]
   },
+  "Jazz": {
+    "tracks": [
+      {
+        "title": "Morning Beneath The Boughs",
+        "artist": "",
+        "file": "music/Jazz/Morning_Beneath_the_Boughs.mp3",
+        "duration": 177.319
+      },
+      {
+        "title": "The Unspoken Hour",
+        "artist": "",
+        "file": "music/Jazz/The_Unspoken_Hour.mp3",
+        "duration": 154.54
+      },
+      {
+        "title": "Velvet Shadows Bleeding Walls",
+        "artist": "",
+        "file": "music/Jazz/Velvet_Shadows_Bleeding_Walls.mp3",
+        "duration": 160.94
+      }
+    ]
+  },
   "Kaikuva": {
     "tracks": [
       {
