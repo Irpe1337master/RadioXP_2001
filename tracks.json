@@ -30,16 +30,34 @@
   "Jazz": {
     "tracks": [
       {
+        "title": "Ambrosia In My Cup",
+        "artist": "",
+        "file": "music/Jazz/Ambrosia_in_My_Cup.mp3",
+        "duration": 158.772
+      },
+      {
         "title": "Morning Beneath The Boughs",
         "artist": "",
         "file": "music/Jazz/Morning_Beneath_the_Boughs.mp3",
         "duration": 177.319
       },
       {
+        "title": "Stillness At Daybreak",
+        "artist": "",
+        "file": "music/Jazz/Stillness_at_Daybreak.mp3",
+        "duration": 174.393
+      },
+      {
         "title": "The Unspoken Hour",
         "artist": "",
         "file": "music/Jazz/The_Unspoken_Hour.mp3",
         "duration": 154.54
+      },
+      {
+        "title": "Unspoken Company",
+        "artist": "",
+        "file": "music/Jazz/Unspoken_Company.mp3",
+        "duration": 180.48
       },
       {
         "title": "Velvet Shadows Bleeding Walls",
