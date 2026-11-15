@@ -86,6 +86,8 @@ input[type=range]{width:90px;accent-color:#3cc03a}
 }
 @media(max-height:480px){.viz,.menu{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.saver{position:fixed;inset:0;z-index:20;background:#000;cursor:none;opacity:0;pointer-events:none;transition:opacity .6s}
+.saver.on{opacity:1;pointer-events:auto}
 </style>
 </head>
 <body>
@@ -123,6 +125,8 @@ input[type=range]{width:90px;accent-color:#3cc03a}
  </div>
  <div class="status"><span id="st">Ready</span><span id="clock"></span></div>
 </div>
+
+<canvas class="saver" id="saver" aria-hidden="true"></canvas>
 
 <script>
 // ---- Settings ----
@@ -297,6 +301,116 @@ function frame(t){
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+// ---- Screensaver: 3D pipes after a while with no input. Music keeps playing. ----
+const IDLE_MS=60000; // how long without input before it starts
+(()=>{
+  const sv=$("saver"),sx=sv.getContext("2d");
+  const COLORS=["#e03030","#30c040","#3070f0","#f0d020","#20d0d0","#d040d0","#f08020","#e8e8e8"];
+  const DIRS=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+  const SPEED=10; // cells per second
+  let on=false,raf=0,last=0,timer=0,W,H,dpr,GX,GY,GZ,f,D,used,pieces,pipe,pipesDone,doneAt;
+
+  const shade=(hex,k)=>{const n=parseInt(hex.slice(1),16),c=[n>>16,n>>8&255,n&255].map(v=>Math.round(k>1?v+(255-v)*(k-1):v*k));return`rgb(${c})`};
+  const key=p=>p.join(",");
+  const free=p=>p[0]>=0&&p[0]<GX&&p[1]>=0&&p[1]<GY&&p[2]>=0&&p[2]<GZ&&!used.has(key(p));
+  // Grid cell -> screen point, plus how far away it is.
+  function proj(p){
+    const X=p[0]-GX/2+.5,Y=p[1]-GY/2+.5,Z=p[2]-GZ/2+.5+D;
+    return{x:W/2+X*f/Z,y:H/2-Y*f/Z,z:Z,s:f/Z};
+  }
+  function size(){
+    dpr=Math.min(devicePixelRatio||1,2);
+    W=sv.width=innerWidth*dpr;H=sv.height=innerHeight*dpr;
+    GX=16;GY=Math.max(6,Math.round(GX*H/W));GZ=12;D=GZ+2;f=W*D/GX*.95;
+    pieces&&pieces.forEach(p=>p.g=null);
+  }
+  function reset(){used=new Set();pieces=[];pipe=null;pipesDone=0;doneAt=0}
+  function newPipe(){
+    for(let i=0;i<50;i++){
+      const p=[0,0,0].map((_,k)=>Math.floor(Math.random()*[GX,GY,GZ][k]));
+      if(free(p)){
+        used.add(key(p));
+        pipe={p,d:DIRS[Math.floor(Math.random()*6)],t:0,len:0,col:COLORS[Math.floor(Math.random()*COLORS.length)]};
+        pieces.push({ball:1,a:p,col:pipe.col});
+        if(!step())endPipe();
+        return true;
+      }
+    }
+    return false;
+  }
+  // Pick where the pipe goes next: mostly straight, sometimes a turn.
+  function step(){
+    const nx=d=>pipe.p.map((v,i)=>v+d[i]);
+    let d=pipe.d;
+    if(!free(nx(d))||Math.random()<.25){
+      const opts=DIRS.filter(o=>o!==pipe.d&&free(nx(o)));
+      if(opts.length)d=opts[Math.floor(Math.random()*opts.length)];
+      else if(!free(nx(d)))return false;
+    }
+    if(d!==pipe.d)pieces.push({ball:1,a:pipe.p,col:pipe.col});
+    pipe.d=d;pipe.n=nx(d);used.add(key(pipe.n));
+    return true;
+  }
+  function endPipe(){pieces.push({ball:1,a:pipe.p,col:pipe.col});pipe=null;pipesDone++}
+
+  function drawPiece(pc){
+    if(pc.ball){
+      const c=proj(pc.a),r=c.s*.27;
+      const g=sx.createRadialGradient(c.x-r*.35,c.y-r*.35,r*.1,c.x,c.y,r);
+      g.addColorStop(0,shade(pc.col,1.6));g.addColorStop(.5,pc.col);g.addColorStop(1,shade(pc.col,.3));
+      sx.fillStyle=g;sx.beginPath();sx.arc(c.x,c.y,r,0,7);sx.fill();return;
+    }
+    const a=proj(pc.a),b=proj(pc.b),r=(a.s+b.s)/2*.2;
+    let dx=b.x-a.x,dy=b.y-a.y;const L=Math.hypot(dx,dy);
+    if(L<.5)return;
+    const nx=-dy/L*r,ny=dx/L*r;
+    if(!pc.g||pc.partial){
+      const g=sx.createLinearGradient(a.x-nx,a.y-ny,a.x+nx,a.y+ny);
+      g.addColorStop(0,shade(pc.col,.25));g.addColorStop(.3,pc.col);g.addColorStop(.42,shade(pc.col,1.55));g.addColorStop(.6,pc.col);g.addColorStop(1,shade(pc.col,.25));
+      pc.g=g;
+    }
+    sx.strokeStyle=pc.g;sx.lineWidth=r*2;sx.lineCap="round"; // round caps hide seams between segments
+    sx.beginPath();sx.moveTo(a.x,a.y);sx.lineTo(b.x,b.y);sx.stroke();
+  }
+  const depth=pc=>pc.ball?proj(pc.a).z-.01:(proj(pc.a).z+proj(pc.b).z)/2;
+
+  function tick(now){
+    if(!on)return;
+    const dt=Math.min(.1,(now-(last||now))/1000);last=now;
+    if(doneAt){if(now-doneAt>2500)reset()}
+    else{
+      if(!pipe&&!newPipe()||pipesDone>=14||used.size>GX*GY*GZ*.35){pipe=null;doneAt=now}
+      if(pipe){
+        pipe.t+=dt*SPEED;
+        while(pipe&&pipe.t>=1){
+          pipe.t-=1;pieces.push({a:pipe.p,b:pipe.n,col:pipe.col});pipe.p=pipe.n;
+          if(++pipe.len>60||!step())endPipe(); // cap length so new colors show up
+        }
+      }
+    }
+    const list=pieces.slice();
+    if(pipe&&pipe.n){const t=pipe.t;list.push({a:pipe.p,b:pipe.p.map((v,i)=>v+(pipe.n[i]-v)*t),col:pipe.col,partial:1})}
+    list.sort((p,q)=>depth(q)-depth(p));
+    sx.fillStyle="#000";sx.fillRect(0,0,W,H);
+    list.forEach(drawPiece);
+    raf=requestAnimationFrame(tick);
+  }
+
+  function start(){
+    if(on||document.hidden)return;
+    on=true;size();reset();last=0;sv.classList.add("on");raf=requestAnimationFrame(tick);
+  }
+  function stop(){on=false;cancelAnimationFrame(raf);sv.classList.remove("on")}
+  function poke(){if(on)stop();clearTimeout(timer);timer=setTimeout(start,IDLE_MS)}
+  // Ignore tiny mouse jitter so the screensaver doesn't close by itself.
+  let mx=-1,my=-1;
+  addEventListener("mousemove",e=>{if(Math.abs(e.clientX-mx)+Math.abs(e.clientY-my)>4||!on){mx=e.clientX;my=e.clientY;poke()}});
+  ["mousedown","keydown","touchstart","wheel"].forEach(ev=>addEventListener(ev,poke,{passive:true}));
+  addEventListener("resize",()=>on&&size());
+  poke();
+  window.screensaver=start; // run screensaver() in the console to preview it
+})();
 </script>
 </body>
 </html>
