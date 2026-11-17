@@ -36,6 +36,12 @@
         "duration": 158.772
       },
       {
+        "title": "Gravity At The Edge",
+        "artist": "",
+        "file": "music/Jazz/Gravity_at_the_Edge.mp3",
+        "duration": 178.39
+      },
+      {
         "title": "Morning Beneath The Boughs",
         "artist": "",
         "file": "music/Jazz/Morning_Beneath_the_Boughs.mp3",
@@ -76,6 +82,12 @@
         "artist": "",
         "file": "music/Jazz/Velvet_Shadows_Bleeding_Walls.mp3",
         "duration": 160.94
+      },
+      {
+        "title": "Wings Made Of Fear",
+        "artist": "",
+        "file": "music/Jazz/Wings_Made_of_Fear.mp3",
+        "duration": 180.323
       }
     ]
   },
